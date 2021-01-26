@@ -67,9 +67,8 @@ def dicom2array(path, voi_lut=True, fix_monochrome=True):
 
 # Load training df
 training_df = pd.read_csv('/home/dairesearch/data/kaggle/data/512_jpg_df.csv', converters ={'EncodedPixels': eval, 'CategoryId': eval})
-samples_df = training_df
-print(samples_df)
 
+samples_df = training_df
 
 # Import mrcnn
 from mrcnn.config import Config
@@ -86,7 +85,7 @@ class DiagnosticConfig(Config):
     NUM_CLASSES = NUM_CATS + 1 # +1 for the background class
 
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 5
+    IMAGES_PER_GPU = 2
 
     BACKBONE = 'resnet50'
 
@@ -181,7 +180,7 @@ WEIGHT_PATH = '/home/dairesearch/home/dairesearch/chest_x_ray_abnormalities_dete
 # Create model and load pretrained weights
 
 LR = 1e-4
-EPOCHS = 27
+EPOCHS = 10
 
 model = modellib.MaskRCNN(mode='training', config=config, model_dir="")
 
@@ -191,6 +190,37 @@ history = model.train(train_dataset, valid_dataset,
             learning_rate=LR,
             epochs=EPOCHS,
             layers='heads')
+
+
+# Plot history train/ val
+history = model.keras_model.history.history
+
+import matplotlib.pyplot as plt
+epochs = range(EPOCHS)
+
+plt.figure(figsize=(18, 6))
+
+plt.subplot(131)
+plt.plot(epochs, history['loss'], label="train loss")
+plt.plot(epochs, history['val_loss'], label="valid loss")
+plt.legend()
+plt.subplot(132)
+plt.plot(epochs, history['mrcnn_class_loss'], label="train class loss")
+plt.plot(epochs, history['val_mrcnn_class_loss'], label="valid class loss")
+plt.legend()
+plt.subplot(133)
+plt.plot(epochs, history['mrcnn_mask_loss'], label="train mask loss")
+plt.plot(epochs, history['val_mrcnn_mask_loss'], label="valid mask loss")
+plt.legend()
+
+plt.show()
+
+
+
+
+
+
+
 
 
 
