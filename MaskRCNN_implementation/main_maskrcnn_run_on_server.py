@@ -9,17 +9,11 @@ print(device_lib.list_local_devices())
 
 # Import libraries
 import os
-import json
-import random
 
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 import cv2
-import itertools
-from tqdm import tqdm
 import pydicom
 from pydicom.pixel_data_handlers.util import apply_voi_lut
 
@@ -37,7 +31,6 @@ orin_df = pd.read_csv(TRAIN_CSV_DIR)
 orin_df = orin_df.query('class_id != 14')
 
 # Helper functions
-
 def get_mask(img_dimensions, x_min, y_min, x_max, y_max):
     img_height, img_width = img_dimensions
     img_mask = np.full((img_height,img_width),0)
@@ -79,7 +72,6 @@ print(samples_df)
 
 
 # Import mrcnn
-
 from mrcnn.config import Config
 from mrcnn import utils
 import mrcnn.model as modellib
@@ -94,7 +86,7 @@ class DiagnosticConfig(Config):
     NUM_CLASSES = NUM_CATS + 1 # +1 for the background class
 
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 5 #That is the maximum with the memory available on kernels
+    IMAGES_PER_GPU = 5
 
     BACKBONE = 'resnet50'
 
@@ -111,10 +103,8 @@ class DiagnosticConfig(Config):
     ROI_POSITIVE_RATIO = 0.33
     DETECTION_MAX_INSTANCES = 300
     DETECTION_MIN_CONFIDENCE = 0.7
-    # STEPS_PER_EPOCH should be the number of instances
-    # divided by (GPU_COUNT*IMAGES_PER_GPU), and so should VALIDATION_STEPS;
-    # however, due to the time limit, I set them so that this kernel can be run in 9 hours
-    STEPS_PER_EPOCH = int(len(samples_df)*0.9/IMAGES_PER_GPU)
+
+    STEPS_PER_EPOCH = int(len(samples_df)*0.8/IMAGES_PER_GPU)
     VALIDATION_STEPS = len(samples_df)-int(len(samples_df)*0.9/IMAGES_PER_GPU)
 
 config = DiagnosticConfig()
@@ -169,11 +159,12 @@ class DiagnosticDataset(utils.Dataset):
             labels.append(int(label)+1)
         return mask, np.array(labels)
 
-# Train/ Val split
-training_percentage = 0.9
+# Split with train = 80% samples and val = 10% and test = 10%
+training_percentage = 0.8
 
 training_set_size = int(training_percentage*len(samples_df))
-validation_set_size = int((1-training_percentage)*len(samples_df))
+validation_set_size = int((0.9-training_percentage)*len(samples_df))
+test_set_size = int((0.9-training_percentage)*len(samples_df))
 
 train_dataset = DiagnosticDataset(samples_df[:training_set_size])
 train_dataset.prepare()
@@ -181,13 +172,16 @@ train_dataset.prepare()
 valid_dataset = DiagnosticDataset(samples_df[training_set_size:training_set_size+validation_set_size])
 valid_dataset.prepare()
 
+test_dataset = DiagnosticDataset(samples_df[training_set_size + validation_set_size:])
+test_dataset.prepare()
+
 # Load weight
 WEIGHT_PATH = '/home/dairesearch/home/dairesearch/chest_x_ray_abnormalities_detection/MaskRCNN_implementation/weights/mask_rcnn_coco.h5'
 
 # Create model and load pretrained weights
 
 LR = 1e-4
-EPOCHS = 10
+EPOCHS = 27
 
 model = modellib.MaskRCNN(mode='training', config=config, model_dir="")
 
