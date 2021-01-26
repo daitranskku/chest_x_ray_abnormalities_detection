@@ -85,7 +85,7 @@ class DiagnosticConfig(Config):
     NUM_CLASSES = NUM_CATS + 1 # +1 for the background class
 
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 2
+    IMAGES_PER_GPU = 5
 
     BACKBONE = 'resnet50'
 
@@ -104,7 +104,7 @@ class DiagnosticConfig(Config):
     DETECTION_MIN_CONFIDENCE = 0.7
 
     STEPS_PER_EPOCH = int(len(samples_df)*0.8/IMAGES_PER_GPU)
-    VALIDATION_STEPS = len(samples_df)-int(len(samples_df)*0.9/IMAGES_PER_GPU)
+    VALIDATION_STEPS = int(len(samples_df)/IMAGES_PER_GPU)-int(len(samples_df)*0.9/IMAGES_PER_GPU)
 
 config = DiagnosticConfig()
 config.display()
