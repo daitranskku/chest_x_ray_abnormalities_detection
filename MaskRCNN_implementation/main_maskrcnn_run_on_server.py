@@ -187,7 +187,7 @@ model = modellib.MaskRCNN(mode='training', config=config, model_dir="")
 # model.load_weights(WEIGHT_PATH, by_name=True, exclude=['mrcnn_class_logits', 'mrcnn_bbox_fc', 'mrcnn_bbox', 'mrcnn_mask'])
 
 history = model.train(train_dataset, valid_dataset,
-            learning_rate=LR/10,
+            learning_rate=LR,
             epochs=EPOCHS,
             layers='all')
 

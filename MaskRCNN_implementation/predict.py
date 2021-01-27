@@ -67,9 +67,7 @@ def dicom2array(path, voi_lut=True, fix_monochrome=True):
 
     return data
 
-
 training_df = pd.read_csv('/home/daitran/Desktop/git/chest_x_ray_abnormalities_detection/MaskRCNN_implementation/sample_df.csv', converters ={'EncodedPixels': eval, 'CategoryId': eval})
-
 
 samples_df = training_df
 # samples_df
@@ -257,21 +255,20 @@ def plot_bbox(img_id , bbox_df = orin_df, normalize = True):
 
     plt.show()
 
-
 # Display original
 
-image_id = random.choice(valid_dataset.image_ids)
+image_id = random.choice(train_dataset.image_ids)
 print(image_id)
-print(valid_dataset.class_names)
+print(train_dataset.class_names)
 
 # Display original Dicom
 
-plot_bbox(img_id = valid_dataset.image_info[image_id]['img_org_id'])
+# plot_bbox(img_id = train_dataset.image_info[image_id]['img_org_id'])
 
 # Display original in training form
 
 original_image, image_meta, gt_class_id, gt_bbox, gt_mask =\
-    modellib.load_image_gt(valid_dataset, inference_config, 
+    modellib.load_image_gt(train_dataset, inference_config, 
                            image_id, use_mini_mask=False)
 
 log("original_image", original_image)
@@ -286,7 +283,7 @@ visualize.display_instances(original_image, gt_bbox, gt_mask, gt_class_id,
 # Display test prediction
 
 results = model.detect([original_image], verbose=1)
-
 r = results[0]
+
 visualize.display_instances(original_image, r['rois'], r['masks'], r['class_ids'], 
-                            valid_dataset.class_names, r['scores'])
+                            train_dataset.class_names, r['scores'])
