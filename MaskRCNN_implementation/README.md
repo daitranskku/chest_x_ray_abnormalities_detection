@@ -28,3 +28,7 @@ valid_dataset.prepare()
 test_dataset = DiagnosticDataset(samples_df[training_set_size + validation_set_size:])
 test_dataset.prepare()
 
+## Inspect trained model
+
+[model_evaluation](model_evaluation.ipynb) performed model evaluation with test dataset
+
