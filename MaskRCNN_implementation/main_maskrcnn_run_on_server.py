@@ -85,7 +85,7 @@ class DiagnosticConfig(Config):
     NUM_CLASSES = NUM_CATS + 1 # +1 for the background class
 
     GPU_COUNT = 1
-    IMAGES_PER_GPU = 5
+    IMAGES_PER_GPU = 10
 
     BACKBONE = 'resnet50'
 
@@ -180,11 +180,11 @@ WEIGHT_PATH = '/home/dairesearch/home/dairesearch/chest_x_ray_abnormalities_dete
 # Create model and load pretrained weights
 
 LR = 1e-4
-EPOCHS = 10
+EPOCHS = 27
 
 model = modellib.MaskRCNN(mode='training', config=config, model_dir="")
 
-model.load_weights(WEIGHT_PATH, by_name=True, exclude=['mrcnn_class_logits', 'mrcnn_bbox_fc', 'mrcnn_bbox', 'mrcnn_mask'])
+# model.load_weights(WEIGHT_PATH, by_name=True, exclude=['mrcnn_class_logits', 'mrcnn_bbox_fc', 'mrcnn_bbox', 'mrcnn_mask'])
 
 history = model.train(train_dataset, valid_dataset,
             learning_rate=LR/10,
