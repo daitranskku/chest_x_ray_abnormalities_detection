@@ -32,3 +32,14 @@ test_dataset.prepare()
 
 [model_evaluation](model_evaluation.ipynb) performed model evaluation with test dataset
 
+## Sample submission
+- Using pretrained model at epoch 27 
+- Using binary classication model for second step filter
+$$-> LB: 0.125$$
+
+## Some notes for improving model:
+1. Develop binary classication model: Normal VS Abnormal
+2. Tuning model parameter and change backbone 
+3. Check bbox fussion for training and testing step
+4. Using stratified k-fold
+5. TTA 
