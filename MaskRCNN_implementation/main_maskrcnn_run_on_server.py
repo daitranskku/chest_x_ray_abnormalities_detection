@@ -175,8 +175,9 @@ test_dataset = DiagnosticDataset(samples_df[training_set_size + validation_set_s
 test_dataset.prepare()
 
 # Load weight
-WEIGHT_PATH = '/home/dairesearch/home/dairesearch/chest_x_ray_abnormalities_detection/MaskRCNN_implementation/weights/mask_rcnn_coco.h5'
+# WEIGHT_PATH = '/home/dairesearch/home/dairesearch/chest_x_ray_abnormalities_detection/MaskRCNN_implementation/weights/mask_rcnn_coco.h5'
 
+WEIGHT_PATH = '/home/dairesearch/home/dairesearch/chest_x_ray_abnormalities_detection/MaskRCNN_implementation/diagnostic20210127T1346/mask_rcnn_diagnostic_0027.h5'
 # Create model and load pretrained weights
 
 LR = 1e-4
@@ -184,7 +185,7 @@ EPOCHS = 100
 
 model = modellib.MaskRCNN(mode='training', config=config, model_dir="")
 
-# model.load_weights(WEIGHT_PATH, by_name=True, exclude=['mrcnn_class_logits', 'mrcnn_bbox_fc', 'mrcnn_bbox', 'mrcnn_mask'])
+model.load_weights(WEIGHT_PATH, by_name=True, exclude=['mrcnn_class_logits', 'mrcnn_bbox_fc', 'mrcnn_bbox', 'mrcnn_mask'])
 
 history = model.train(train_dataset, valid_dataset,
             learning_rate=LR,
