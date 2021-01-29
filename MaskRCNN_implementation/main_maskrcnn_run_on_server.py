@@ -180,7 +180,7 @@ WEIGHT_PATH = '/home/dairesearch/home/dairesearch/chest_x_ray_abnormalities_dete
 # Create model and load pretrained weights
 
 LR = 1e-4
-EPOCHS = 27
+EPOCHS = 100
 
 model = modellib.MaskRCNN(mode='training', config=config, model_dir="")
 
