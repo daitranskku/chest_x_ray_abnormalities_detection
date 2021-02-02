@@ -18,11 +18,11 @@ from mrcnn import utils
 import mrcnn.model as modellib
 
 # tl;dr
-TRAINING_SIZE = 1024  # 1024 png or 512 jpg
-AUGMENTATION = False # True or False
-IMG_PER_GPU = 5
+TRAINING_SIZE = 512  # 1024 png or 512 jpg
+AUGMENTATION = True # True or False
+IMG_PER_GPU = 10
 LR = 1e-4
-EPOCHS = 1
+EPOCHS = 27
 
 # Data directories
 DATA_DIR = "/home/dairesearch/data/kaggle/data/"
@@ -91,7 +91,7 @@ class DiagnosticDataset(utils.Dataset):
         for i, row in df.iterrows():
             self.add_image("diagnostic",
                            image_id=row.name,
-                           path= PREPROCESSED_TRAINING_IMAGE_FOLDER+str(row.image_id)+".png", # Check and change with jpg if 512
+                           path= PREPROCESSED_TRAINING_IMAGE_FOLDER+str(row.image_id)+".jpg", # Check and change with jpg if 512
                            labels=row['CategoryId'],
                            annotations=row['EncodedPixels'],
                            height=row['Height'], width=row['Width'],
@@ -152,7 +152,7 @@ df_train = pd.merge(df, df_folds[df_folds['fold'] != 0], on='image_id')
 maskrcnn_df_train = samples_df[~samples_df['image_id'].isin(df_valid['image_id'])]
 maskrcnn_df_val = samples_df[~samples_df['image_id'].isin(df_train['image_id'])]
 
-# Apply formart
+# Apply format
 train_dataset = DiagnosticDataset(maskrcnn_df_train)
 train_dataset.prepare()
 
@@ -182,14 +182,18 @@ augmentation = iaa.Sequential([
 ])
 
 # Load weight coco
-WEIGHT_PATH = '/home/dairesearch/home/dairesearch/chest_x_ray_abnormalities_detection/MaskRCNN_implementation/weights/mask_rcnn_coco.h5'
+WEIGHT_PATH = '/home/dairesearch/home/dairesearch/chest_x_ray_abnormalities_detection/MaskRCNN_implementation/diagnostic20210201T2145/mask_rcnn_diagnostic_0002.h5'
 
 # Create model and load pretrained weights
 model = modellib.MaskRCNN(mode='training', config=config, model_dir="")
 
-model.load_weights(WEIGHT_PATH, by_name=True, exclude=['mrcnn_class_logits', 'mrcnn_bbox_fc', 'mrcnn_bbox', 'mrcnn_mask'])
+# model.load_weights(WEIGHT_PATH, by_name=True, exclude=['mrcnn_class_logits', 'mrcnn_bbox_fc', 'mrcnn_bbox', 'mrcnn_mask'])
+
+# Continue training
+model.load_weights(WEIGHT_PATH, by_name=True)
 
 if augmentation:
+    print('TRAINING WITH AUGMENTATION')
     model.train(train_dataset, valid_dataset,
                 learning_rate=LR,
                 epochs=EPOCHS,
