@@ -20,9 +20,9 @@ import mrcnn.model as modellib
 # tl;dr
 TRAINING_SIZE = 512  # 1024 png or 512 jpg
 AUGMENTATION = True # True or False
-IMG_PER_GPU = 10
+IMG_PER_GPU = 16
 LR = 1e-4
-EPOCHS = 27
+EPOCHS = 100
 
 # Data directories
 DATA_DIR = "/home/dairesearch/data/kaggle/data/"
@@ -169,7 +169,6 @@ augmentation = iaa.Sequential([
             rotate=(-2, 2),
             shear=(-1, 1),
         ),
-        iaa.PiecewiseAffine(scale=(0.001, 0.025)),
     ]),
     iaa.OneOf([ ## brightness or contrast
         iaa.Multiply((0.9, 1.1)),
@@ -182,15 +181,15 @@ augmentation = iaa.Sequential([
 ])
 
 # Load weight coco
-WEIGHT_PATH = '/home/dairesearch/home/dairesearch/chest_x_ray_abnormalities_detection/MaskRCNN_implementation/diagnostic20210201T2145/mask_rcnn_diagnostic_0002.h5'
+WEIGHT_PATH = '/home/dairesearch/home/dairesearch/chest_x_ray_abnormalities_detection/MaskRCNN_implementation/weights/mask_rcnn_coco.h5'
 
 # Create model and load pretrained weights
 model = modellib.MaskRCNN(mode='training', config=config, model_dir="")
 
-# model.load_weights(WEIGHT_PATH, by_name=True, exclude=['mrcnn_class_logits', 'mrcnn_bbox_fc', 'mrcnn_bbox', 'mrcnn_mask'])
+model.load_weights(WEIGHT_PATH, by_name=True, exclude=['mrcnn_class_logits', 'mrcnn_bbox_fc', 'mrcnn_bbox', 'mrcnn_mask'])
 
 # Continue training
-model.load_weights(WEIGHT_PATH, by_name=True)
+# model.load_weights(WEIGHT_PATH, by_name=True)
 
 if augmentation:
     print('TRAINING WITH AUGMENTATION')

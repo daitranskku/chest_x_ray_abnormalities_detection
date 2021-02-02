@@ -2553,7 +2553,7 @@ class MaskRCNN(object):
             workers = multiprocessing.cpu_count()
 
         # XXX make multiprocessing work again
-        workers = 4
+        workers = 1
 
         self.keras_model.fit_generator(
             train_generator,
@@ -2563,7 +2563,7 @@ class MaskRCNN(object):
             callbacks=callbacks,
             validation_data=val_generator,
             validation_steps=self.config.VALIDATION_STEPS,
-            max_queue_size=100,
+            max_queue_size=10,
             workers=workers,
             use_multiprocessing=workers > 1,
         )
