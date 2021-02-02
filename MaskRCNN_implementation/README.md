@@ -16,18 +16,19 @@ Using stratifield kfold to divide train/ val set
 ![kfold](figures/k-fold.jpg)
 
 File [training_augmentation_kfold.ipynb](training_augmentation_kfold.ipynb) shows step-by-step implement MaskRCNN with augmentation and k-fold split data.
+File [maskrcnn_augmentation_kfold.py](maskrcnn_augmentation_kfold.py) is used to implement code on server with Tesla V100.
 ## Inspect trained model
 
 [model_evaluation](model_evaluation.ipynb) performed model evaluation with test dataset
 
 ## Sample submission
 - Using pretrained model at epoch 27 
-- Using binary classication model for second step filter
+- Using [binary classification model](2_class_filter_submission.ipynb) for second step filter
 $$-> LB: 0.125$$
 
 ## Some notes for improving model:
-1. Develop binary classication model: Normal VS Abnormal
+1. Develop binary classification model: Normal VS Abnormal
 2. Tuning model parameter and change backbone 
-3. Check bbox fussion for training and testing step
+3. Check bbox fusion for training and testing step
 4. Using stratified k-fold
 5. TTA 
