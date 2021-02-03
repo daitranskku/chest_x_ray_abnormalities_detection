@@ -21,6 +21,7 @@ import mrcnn.model as modellib
 TRAINING_SIZE = 512  # 1024 png or 512 jpg
 AUGMENTATION = True # True or False
 IMG_PER_GPU = 16
+BACKBONE_ARCHITECTURE = "resnet101" # resnet 50 or resnet 101
 LR = 1e-4
 EPOCHS = 100
 
@@ -53,7 +54,7 @@ class DiagnosticConfig(Config):
     GPU_COUNT = 1
     IMAGES_PER_GPU = IMG_PER_GPU
 
-    BACKBONE = 'resnet50'
+    BACKBONE = BACKBONE_ARCHITECTURE
 
     IMAGE_MIN_DIM = IMAGE_SIZE
     IMAGE_MAX_DIM = IMAGE_SIZE
@@ -61,12 +62,22 @@ class DiagnosticConfig(Config):
 
     POST_NMS_ROIS_TRAINING = 250
     POST_NMS_ROIS_INFERENCE = 150
-    MAX_GROUNDTRUTH_INSTANCES = 5
+
+    # Maximum number of ground truth instances to use in one image
+    MAX_GT_INSTANCES = 30
+
+    # The strides of each layer of the FPN Pyramid. These values
+    # are based on a Resnet101 backbone.
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]
-    BACKBONESHAPE = (8, 16, 24, 32, 48)
+    # BACKBONESHAPE = (8, 16, 24, 32, 48)
+    # Length of square anchor side in pixels
     RPN_ANCHOR_SCALES = (8,16,24,32,48)
+    # Percent of positive ROIs used to train classifier/mask heads
     ROI_POSITIVE_RATIO = 0.33
+    # Max number of final detections
     DETECTION_MAX_INSTANCES = 300
+    # Minimum probability value to accept a detected instance
+    # ROIs below this threshold are skipped
     DETECTION_MIN_CONFIDENCE = 0.7
 
     STEPS_PER_EPOCH = int(len(samples_df)*0.8/IMAGES_PER_GPU)
