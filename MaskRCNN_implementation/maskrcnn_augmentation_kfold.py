@@ -20,7 +20,7 @@ import mrcnn.model as modellib
 # tl;dr
 TRAINING_SIZE = 512  # 1024 png or 512 jpg
 AUGMENTATION = True # True or False
-IMG_PER_GPU = 16
+IMG_PER_GPU = 10
 BACKBONE_ARCHITECTURE = "resnet101" # resnet 50 or resnet 101
 LR = 1e-4
 EPOCHS = 100
