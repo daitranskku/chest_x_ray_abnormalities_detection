@@ -46,7 +46,46 @@ if TRAINING_SIZE == 1024:
 elif TRAINING_SIZE == 512:
     IMAGE_SIZE = 512
 
-# Create Config 
+# # Create Config Normal
+# class DiagnosticConfig(Config):
+#     NAME = "Diagnostic"
+#     NUM_CLASSES = NUM_CATS + 1 # +1 for the background class
+#
+#     GPU_COUNT = 1
+#     IMAGES_PER_GPU = IMG_PER_GPU
+#
+#     BACKBONE = BACKBONE_ARCHITECTURE
+#
+#     IMAGE_MIN_DIM = IMAGE_SIZE
+#     IMAGE_MAX_DIM = IMAGE_SIZE
+#
+#     # Try resize
+#     IMAGE_RESIZE_MODE = 'none'
+#
+#     POST_NMS_ROIS_TRAINING = 250
+#     POST_NMS_ROIS_INFERENCE = 150
+#
+#     # Maximum number of ground truth instances to use in one image
+#     MAX_GT_INSTANCES = 30
+#
+#     # The strides of each layer of the FPN Pyramid. These values
+#     # are based on a Resnet101 backbone.
+#     BACKBONE_STRIDES = [4, 8, 16, 32, 64]
+#     # BACKBONESHAPE = (8, 16, 24, 32, 48)
+#     # Length of square anchor side in pixels
+#     RPN_ANCHOR_SCALES = (8,16,24,32,48)
+#     # Percent of positive ROIs used to train classifier/mask heads
+#     ROI_POSITIVE_RATIO = 0.33
+#     # Max number of final detections
+#     DETECTION_MAX_INSTANCES = 300
+#     # Minimum probability value to accept a detected instance
+#     # ROIs below this threshold are skipped
+#     DETECTION_MIN_CONFIDENCE = 0.7
+#
+#     STEPS_PER_EPOCH = int(len(samples_df)*0.8/IMAGES_PER_GPU)
+#     VALIDATION_STEPS = int(len(samples_df)/IMAGES_PER_GPU)-int(len(samples_df)*0.8/IMAGES_PER_GPU)
+
+# Create Config Customize
 class DiagnosticConfig(Config):
     NAME = "Diagnostic"
     NUM_CLASSES = NUM_CATS + 1 # +1 for the background class
@@ -58,10 +97,13 @@ class DiagnosticConfig(Config):
 
     IMAGE_MIN_DIM = IMAGE_SIZE
     IMAGE_MAX_DIM = IMAGE_SIZE
-    IMAGE_RESIZE_MODE = 'none'
 
-    POST_NMS_ROIS_TRAINING = 250
-    POST_NMS_ROIS_INFERENCE = 150
+    # Try resize
+    IMAGE_RESIZE_MODE = 'crop'
+    IMAGE_MIN_SCALE = 2.0
+
+    POST_NMS_ROIS_TRAINING = 2000
+    POST_NMS_ROIS_INFERENCE = 1000
 
     # Maximum number of ground truth instances to use in one image
     MAX_GT_INSTANCES = 30
@@ -71,7 +113,7 @@ class DiagnosticConfig(Config):
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]
     # BACKBONESHAPE = (8, 16, 24, 32, 48)
     # Length of square anchor side in pixels
-    RPN_ANCHOR_SCALES = (8,16,24,32,48)
+    RPN_ANCHOR_SCALES = (8,16,32, 64, 128)
     # Percent of positive ROIs used to train classifier/mask heads
     ROI_POSITIVE_RATIO = 0.33
     # Max number of final detections
@@ -79,6 +121,10 @@ class DiagnosticConfig(Config):
     # Minimum probability value to accept a detected instance
     # ROIs below this threshold are skipped
     DETECTION_MIN_CONFIDENCE = 0.7
+
+    # Non-max suppression threshold to filter RPN proposals.
+    # You can increase this during training to generate more propsals.
+    RPN_NMS_THRESHOLD = 0.9
 
     STEPS_PER_EPOCH = int(len(samples_df)*0.8/IMAGES_PER_GPU)
     VALIDATION_STEPS = int(len(samples_df)/IMAGES_PER_GPU)-int(len(samples_df)*0.8/IMAGES_PER_GPU)
