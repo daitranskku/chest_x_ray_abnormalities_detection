@@ -20,7 +20,7 @@ import mrcnn.model as modellib
 # tl;dr
 TRAINING_SIZE = 512  # 1024 png or 512 jpg
 AUGMENTATION = True # True or False
-IMG_PER_GPU = 10
+IMG_PER_GPU = 5
 BACKBONE_ARCHITECTURE = "resnet101" # resnet 50 or resnet 101
 LR = 1e-4
 EPOCHS = 100
@@ -40,13 +40,16 @@ elif TRAINING_SIZE == 512:
     PREPROCESSED_TRAINING_IMAGE_FOLDER = '/home/dairesearch/data/kaggle/data/512_jpg/'
     samples_df = pd.read_csv('/home/dairesearch/data/kaggle/data/512_jpg_df.csv', converters={'EncodedPixels': eval, 'CategoryId': eval})
 
+# # DEBUG
+# samples_df = samples_df[:100]
+
 NUM_CATS = 14
 if TRAINING_SIZE == 1024:
     IMAGE_SIZE = 1024
 elif TRAINING_SIZE == 512:
     IMAGE_SIZE = 512
 
-# # Create Config Normal
+# Create Config Normal
 # class DiagnosticConfig(Config):
 #     NAME = "Diagnostic"
 #     NUM_CLASSES = NUM_CATS + 1 # +1 for the background class
@@ -73,7 +76,7 @@ elif TRAINING_SIZE == 512:
 #     BACKBONE_STRIDES = [4, 8, 16, 32, 64]
 #     # BACKBONESHAPE = (8, 16, 24, 32, 48)
 #     # Length of square anchor side in pixels
-#     RPN_ANCHOR_SCALES = (8,16,24,32,48)
+#     RPN_ANCHOR_SCALES = (8, 16, 24, 32, 48)
 #     # Percent of positive ROIs used to train classifier/mask heads
 #     ROI_POSITIVE_RATIO = 0.33
 #     # Max number of final detections
@@ -82,9 +85,18 @@ elif TRAINING_SIZE == 512:
 #     # ROIs below this threshold are skipped
 #     DETECTION_MIN_CONFIDENCE = 0.7
 #
+#     # Weight decay
+#     WEIGHT_DECAY = 0.0005
+#     # Number of ROIs per image to feed to classifier/mask heads
+#     # The Mask RCNN paper uses 512 but often the RPN doesn't generate
+#     # enough positive proposals to fill this and keep a positive:negative
+#     # ratio of 1:3. You can increase the number of proposals by adjusting
+#     # the RPN NMS threshold.
+#     TRAIN_ROIS_PER_IMAGE = 512
+#
 #     STEPS_PER_EPOCH = int(len(samples_df)*0.8/IMAGES_PER_GPU)
 #     VALIDATION_STEPS = int(len(samples_df)/IMAGES_PER_GPU)-int(len(samples_df)*0.8/IMAGES_PER_GPU)
-
+#
 # Create Config Customize
 class DiagnosticConfig(Config):
     NAME = "Diagnostic"
@@ -99,21 +111,21 @@ class DiagnosticConfig(Config):
     IMAGE_MAX_DIM = IMAGE_SIZE
 
     # Try resize
-    IMAGE_RESIZE_MODE = 'crop'
-    IMAGE_MIN_SCALE = 2.0
+    IMAGE_RESIZE_MODE = "none"
+    # IMAGE_MIN_SCALE = 2.0
 
-    POST_NMS_ROIS_TRAINING = 2000
-    POST_NMS_ROIS_INFERENCE = 1000
+    # POST_NMS_ROIS_TRAINING = 2000
+    # POST_NMS_ROIS_INFERENCE = 1000
 
     # Maximum number of ground truth instances to use in one image
-    MAX_GT_INSTANCES = 30
+    MAX_GT_INSTANCES = 50
 
     # The strides of each layer of the FPN Pyramid. These values
     # are based on a Resnet101 backbone.
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]
     # BACKBONESHAPE = (8, 16, 24, 32, 48)
     # Length of square anchor side in pixels
-    RPN_ANCHOR_SCALES = (8,16,32, 64, 128)
+    RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)
     # Percent of positive ROIs used to train classifier/mask heads
     ROI_POSITIVE_RATIO = 0.33
     # Max number of final detections
@@ -125,6 +137,8 @@ class DiagnosticConfig(Config):
     # Non-max suppression threshold to filter RPN proposals.
     # You can increase this during training to generate more propsals.
     RPN_NMS_THRESHOLD = 0.9
+
+    TRAIN_BN = True
 
     STEPS_PER_EPOCH = int(len(samples_df)*0.8/IMAGES_PER_GPU)
     VALIDATION_STEPS = int(len(samples_df)/IMAGES_PER_GPU)-int(len(samples_df)*0.8/IMAGES_PER_GPU)
@@ -248,18 +262,50 @@ model.load_weights(WEIGHT_PATH, by_name=True, exclude=['mrcnn_class_logits', 'mr
 # Continue training
 # model.load_weights(WEIGHT_PATH, by_name=True)
 
-if augmentation:
-    print('TRAINING WITH AUGMENTATION')
-    model.train(train_dataset, valid_dataset,
-                learning_rate=LR,
-                epochs=EPOCHS,
-                layers='all',
-                augmentation=augmentation)
+# if augmentation:
+#     print('TRAINING WITH AUGMENTATION')
+#     model.train(train_dataset, valid_dataset,
+#                 learning_rate=LR,
+#                 epochs=EPOCHS,
+#                 layers='all',
+#                 augmentation=augmentation)
+#
+# model.train(train_dataset,
+#             valid_dataset,
+#             learning_rate=LR,
+#             epochs=EPOCHS,
+#             layers='all')
+
+
+# RSNA Training produce
+LEARNING_RATE = 0.005
 
 model.train(train_dataset, valid_dataset,
-            learning_rate=LR,
-            epochs=EPOCHS,
-            layers='all')
+             learning_rate=LEARNING_RATE*2,
+             epochs=1, #default 2
+             layers='heads',
+             augmentation=None)  ## no need to augment yet
+
+model.train(train_dataset, valid_dataset,
+             learning_rate=LEARNING_RATE,
+             epochs=6,
+             layers='all',
+             augmentation=augmentation)
+
+model.train(train_dataset, valid_dataset,
+            learning_rate=LEARNING_RATE/5,
+            epochs=9,
+            layers='all',
+            augmentation=augmentation)
+model.train(train_dataset, valid_dataset,
+        #learning_rate=LEARNING_RATE/5,
+        learning_rate=LEARNING_RATE/10,
+        epochs=12,
+        layers='all',
+        augmentation=augmentation)
+
+
+
 
 # Plot history train/ val
 history = model.keras_model.history.history
