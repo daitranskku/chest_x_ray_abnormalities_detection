@@ -73,9 +73,9 @@ samples_df = training_df
 # Import mrcnn
 from mrcnn.config import Config
 from mrcnn import utils
-import mrcnn.model as modellib
+import mrcnn.model_vin as modellib
 from mrcnn import visualize
-from mrcnn.model import log
+from mrcnn.model_vin import log
 
 NUM_CATS = 14
 IMAGE_SIZE = 512

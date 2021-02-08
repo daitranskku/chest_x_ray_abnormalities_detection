@@ -12,7 +12,8 @@
 
 ![siim](figures/siim.png)
 
-3. [CheXpert] 
+3. [CheXpert](https://stanfordmlgroup.github.io/competitions/chexpert/)
+
 ## Top prize solution overview
 
 ## 1. [RSNA Pneumonia Detection Challenge](https://www.kaggle.com/c/rsna-pneumonia-detection-challenge)
