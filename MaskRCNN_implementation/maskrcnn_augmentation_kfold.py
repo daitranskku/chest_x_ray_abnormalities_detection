@@ -20,7 +20,7 @@ import mrcnn.model as modellib
 # tl;dr
 TRAINING_SIZE = 512  # 1024 png or 512 jpg
 AUGMENTATION = True # True or False
-IMG_PER_GPU = 5
+IMG_PER_GPU = 10
 BACKBONE_ARCHITECTURE = "resnet101" # resnet 50 or resnet 101
 LR = 1e-4
 EPOCHS = 100
@@ -50,54 +50,6 @@ elif TRAINING_SIZE == 512:
     IMAGE_SIZE = 512
 
 # Create Config Normal
-# class DiagnosticConfig(Config):
-#     NAME = "Diagnostic"
-#     NUM_CLASSES = NUM_CATS + 1 # +1 for the background class
-#
-#     GPU_COUNT = 1
-#     IMAGES_PER_GPU = IMG_PER_GPU
-#
-#     BACKBONE = BACKBONE_ARCHITECTURE
-#
-#     IMAGE_MIN_DIM = IMAGE_SIZE
-#     IMAGE_MAX_DIM = IMAGE_SIZE
-#
-#     # Try resize
-#     IMAGE_RESIZE_MODE = 'none'
-#
-#     POST_NMS_ROIS_TRAINING = 250
-#     POST_NMS_ROIS_INFERENCE = 150
-#
-#     # Maximum number of ground truth instances to use in one image
-#     MAX_GT_INSTANCES = 30
-#
-#     # The strides of each layer of the FPN Pyramid. These values
-#     # are based on a Resnet101 backbone.
-#     BACKBONE_STRIDES = [4, 8, 16, 32, 64]
-#     # BACKBONESHAPE = (8, 16, 24, 32, 48)
-#     # Length of square anchor side in pixels
-#     RPN_ANCHOR_SCALES = (8, 16, 24, 32, 48)
-#     # Percent of positive ROIs used to train classifier/mask heads
-#     ROI_POSITIVE_RATIO = 0.33
-#     # Max number of final detections
-#     DETECTION_MAX_INSTANCES = 300
-#     # Minimum probability value to accept a detected instance
-#     # ROIs below this threshold are skipped
-#     DETECTION_MIN_CONFIDENCE = 0.7
-#
-#     # Weight decay
-#     WEIGHT_DECAY = 0.0005
-#     # Number of ROIs per image to feed to classifier/mask heads
-#     # The Mask RCNN paper uses 512 but often the RPN doesn't generate
-#     # enough positive proposals to fill this and keep a positive:negative
-#     # ratio of 1:3. You can increase the number of proposals by adjusting
-#     # the RPN NMS threshold.
-#     TRAIN_ROIS_PER_IMAGE = 512
-#
-#     STEPS_PER_EPOCH = int(len(samples_df)*0.8/IMAGES_PER_GPU)
-#     VALIDATION_STEPS = int(len(samples_df)/IMAGES_PER_GPU)-int(len(samples_df)*0.8/IMAGES_PER_GPU)
-#
-# Create Config Customize
 class DiagnosticConfig(Config):
     NAME = "Diagnostic"
     NUM_CLASSES = NUM_CATS + 1 # +1 for the background class
@@ -111,21 +63,20 @@ class DiagnosticConfig(Config):
     IMAGE_MAX_DIM = IMAGE_SIZE
 
     # Try resize
-    IMAGE_RESIZE_MODE = "none"
-    # IMAGE_MIN_SCALE = 2.0
+    IMAGE_RESIZE_MODE = 'none'
 
-    # POST_NMS_ROIS_TRAINING = 2000
-    # POST_NMS_ROIS_INFERENCE = 1000
+    POST_NMS_ROIS_TRAINING = 250
+    POST_NMS_ROIS_INFERENCE = 150
 
     # Maximum number of ground truth instances to use in one image
-    MAX_GT_INSTANCES = 50
+    MAX_GT_INSTANCES = 30
 
     # The strides of each layer of the FPN Pyramid. These values
     # are based on a Resnet101 backbone.
     BACKBONE_STRIDES = [4, 8, 16, 32, 64]
     # BACKBONESHAPE = (8, 16, 24, 32, 48)
     # Length of square anchor side in pixels
-    RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)
+    RPN_ANCHOR_SCALES = (8, 16, 24, 32, 48)
     # Percent of positive ROIs used to train classifier/mask heads
     ROI_POSITIVE_RATIO = 0.33
     # Max number of final detections
@@ -134,14 +85,63 @@ class DiagnosticConfig(Config):
     # ROIs below this threshold are skipped
     DETECTION_MIN_CONFIDENCE = 0.7
 
-    # Non-max suppression threshold to filter RPN proposals.
-    # You can increase this during training to generate more propsals.
-    RPN_NMS_THRESHOLD = 0.9
-
-    TRAIN_BN = True
+    # Weight decay
+    # WEIGHT_DECAY = 0.0005
+    # Number of ROIs per image to feed to classifier/mask heads
+    # The Mask RCNN paper uses 512 but often the RPN doesn't generate
+    # enough positive proposals to fill this and keep a positive:negative
+    # ratio of 1:3. You can increase the number of proposals by adjusting
+    # the RPN NMS threshold.
+    TRAIN_ROIS_PER_IMAGE = 512
 
     STEPS_PER_EPOCH = int(len(samples_df)*0.8/IMAGES_PER_GPU)
     VALIDATION_STEPS = int(len(samples_df)/IMAGES_PER_GPU)-int(len(samples_df)*0.8/IMAGES_PER_GPU)
+#
+# Create Config Customize
+# class DiagnosticConfig(Config):
+#     NAME = "Diagnostic"
+#     NUM_CLASSES = NUM_CATS + 1 # +1 for the background class
+#
+#     GPU_COUNT = 1
+#     IMAGES_PER_GPU = IMG_PER_GPU
+#
+#     BACKBONE = BACKBONE_ARCHITECTURE
+#
+#     IMAGE_MIN_DIM = IMAGE_SIZE
+#     IMAGE_MAX_DIM = IMAGE_SIZE
+#
+#     # Try resize
+#     IMAGE_RESIZE_MODE = "none"
+#     # IMAGE_MIN_SCALE = 2.0
+#
+#     # POST_NMS_ROIS_TRAINING = 2000
+#     # POST_NMS_ROIS_INFERENCE = 1000
+#
+#     # Maximum number of ground truth instances to use in one image
+#     MAX_GT_INSTANCES = 50
+#
+#     # The strides of each layer of the FPN Pyramid. These values
+#     # are based on a Resnet101 backbone.
+#     BACKBONE_STRIDES = [4, 8, 16, 32, 64]
+#     # BACKBONESHAPE = (8, 16, 24, 32, 48)
+#     # Length of square anchor side in pixels
+#     RPN_ANCHOR_SCALES = (8, 16, 32, 64, 128)
+#     # Percent of positive ROIs used to train classifier/mask heads
+#     ROI_POSITIVE_RATIO = 0.33
+#     # Max number of final detections
+#     DETECTION_MAX_INSTANCES = 300
+#     # Minimum probability value to accept a detected instance
+#     # ROIs below this threshold are skipped
+#     DETECTION_MIN_CONFIDENCE = 0.7
+#
+#     # Non-max suppression threshold to filter RPN proposals.
+#     # You can increase this during training to generate more propsals.
+#     RPN_NMS_THRESHOLD = 0.9
+#
+#     # TRAIN_BN = True
+#
+#     STEPS_PER_EPOCH = int(len(samples_df)*0.8/IMAGES_PER_GPU)
+#     VALIDATION_STEPS = int(len(samples_df)/IMAGES_PER_GPU)-int(len(samples_df)*0.8/IMAGES_PER_GPU)
 
 config = DiagnosticConfig()
 
@@ -236,18 +236,18 @@ augmentation = iaa.Sequential([
     iaa.OneOf([ ## geometric transform
         iaa.Affine(
             scale={"x": (0.98, 1.02), "y": (0.98, 1.04)},
-            translate_percent={"x": (-0.02, 0.02), "y": (-0.04, 0.04)},
-            rotate=(-2, 2),
-            shear=(-1, 1),
+            # translate_percent={"x": (-0.02, 0.02), "y": (-0.04, 0.04)},
+            # rotate=(-2, 2),
+            # shear=(-1, 1),
         ),
     ]),
     iaa.OneOf([ ## brightness or contrast
-        iaa.Multiply((0.9, 1.1)),
+        # iaa.Multiply((0.9, 1.1)),
         iaa.ContrastNormalization((0.9, 1.1)),
     ]),
     iaa.OneOf([ ## blur or sharpen
         iaa.GaussianBlur(sigma=(0.0, 0.1)),
-        iaa.Sharpen(alpha=(0.0, 0.1)),
+        # iaa.Sharpen(alpha=(0.0, 0.1)),
     ]),
 ])
 
