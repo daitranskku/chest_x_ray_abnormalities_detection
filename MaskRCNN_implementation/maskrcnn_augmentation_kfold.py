@@ -20,7 +20,7 @@ import mrcnn.model as modellib
 # tl;dr
 TRAINING_SIZE = 512  # 1024 png or 512 jpg
 AUGMENTATION = True # True or False
-IMG_PER_GPU = 10
+IMG_PER_GPU = 5
 BACKBONE_ARCHITECTURE = "resnet101" # resnet 50 or resnet 101
 LR = 1e-4
 EPOCHS = 100
@@ -236,18 +236,18 @@ augmentation = iaa.Sequential([
     iaa.OneOf([ ## geometric transform
         iaa.Affine(
             scale={"x": (0.98, 1.02), "y": (0.98, 1.04)},
-            # translate_percent={"x": (-0.02, 0.02), "y": (-0.04, 0.04)},
-            # rotate=(-2, 2),
-            # shear=(-1, 1),
+            translate_percent={"x": (-0.02, 0.02), "y": (-0.04, 0.04)},
+            rotate=(-2, 2),
+            shear=(-1, 1),
         ),
     ]),
     iaa.OneOf([ ## brightness or contrast
-        # iaa.Multiply((0.9, 1.1)),
+        iaa.Multiply((0.9, 1.1)),
         iaa.ContrastNormalization((0.9, 1.1)),
     ]),
     iaa.OneOf([ ## blur or sharpen
         iaa.GaussianBlur(sigma=(0.0, 0.1)),
-        # iaa.Sharpen(alpha=(0.0, 0.1)),
+        iaa.Sharpen(alpha=(0.0, 0.1)),
     ]),
 ])
 
@@ -278,13 +278,13 @@ model.load_weights(WEIGHT_PATH, by_name=True, exclude=['mrcnn_class_logits', 'mr
 
 
 # RSNA Training produce
-LEARNING_RATE = 0.005
+LEARNING_RATE = 0.0001
 
-model.train(train_dataset, valid_dataset,
-             learning_rate=LEARNING_RATE*2,
-             epochs=1, #default 2
-             layers='heads',
-             augmentation=None)  ## no need to augment yet
+# model.train(train_dataset, valid_dataset,
+#              learning_rate=LEARNING_RATE*2,
+#              epochs=1, #default 2
+#              layers='heads',
+#              augmentation=None)  ## no need to augment yet
 
 model.train(train_dataset, valid_dataset,
              learning_rate=LEARNING_RATE,
